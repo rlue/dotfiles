@@ -1,0 +1,13 @@
+profiles:
+  zh-literacy:
+    extract:zh:
+      ignore: ~/notes/study/chinese/zh-literacy.csv
+    append:zhuyin:
+    append:cangjie:
+    append:zh-compounds:
+      omit-headword: true
+    append:zh-audio-char-hint:
+      media-dir: ~/.local/share/Anki2/Default/collection.media/
+    output:
+      path: ~/notes/study/chinese/zh-literacy.csv
+      append: true

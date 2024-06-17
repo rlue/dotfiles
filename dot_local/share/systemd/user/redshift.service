@@ -1,0 +1,13 @@
+[Unit]
+Description=Redshift color temperature daemon
+After=network.target
+StartLimitIntervalSec=65
+StartLimitBurst=20
+
+[Service]
+ExecStart=/usr/bin/redshift
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

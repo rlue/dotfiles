@@ -1,0 +1,40 @@
+defaults
+auth on
+port 465
+tls on
+tls_starttls off
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+
+account gmail
+host smtp.gmail.com
+from ryan.lue@gmail.com
+user ryan.lue
+passwordeval "pass web/email/ryan.lue@gmail.com"
+
+account hello
+host mail.privateemail.com
+from hello@ryanlue.com
+user hello@ryanlue.com
+passwordeval "pass web/email/hello@ryanlue.com"
+
+account lists
+host mail.privateemail.com
+from lists@ryanlue.com
+user lists@ryanlue.com
+passwordeval "pass web/email/lists@ryanlue.com"
+
+account zammad
+host mx2.zammad.com
+port 587
+tls_starttls on
+from rl@zammad.com
+user rl@zammad.com
+passwordeval "pass web/email/rl@zammad.com"
+
+account ltrain
+host mail.privateemail.com
+from zero@ltra.in
+user zero@ltra.in
+passwordeval "pass web/email/zero@ltra.in"
+
+account default : gmail

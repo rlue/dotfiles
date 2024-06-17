@@ -1,0 +1,55 @@
+# This is Git's per-user configuration file.
+[credential "https://github.com"]
+	helper = !pass git/rlue@github
+[credential "smtp://hello%40ryanlue.com@mail.privateemail.com%3a465"]
+	helper = !pass git/hello@ryanlue.com
+[user]
+	name = Ryan Lue
+	email = hello@ryanlue.com
+[core]
+	editor = nvim
+	; pager  = "vim -R -c 'set ft=git nowrap' -c 'AnsiEsc' -"
+[init]
+	defaultBranch = master
+[merge]
+	tool = vimdiff
+[push]
+	default = current
+	autoSetupRemote = true
+[commit]
+	verbose = true
+[alias]
+	br = branch
+	co = checkout
+	cp = cherry-pick
+	cm = commit
+	df = diff
+	dt = difftool
+	lg = log --color --graph --pretty=format:'%Cred %h %Creset-%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+	mg = merge
+	mc = merge --no-ff
+	; ninja edit
+	ne = "!f() { git add $1 && git cm --amend --no-edit; }; f"
+	rb = rebase
+	rs = restore
+	sh = show --stat --pretty=format:'%C(yellow)%h%C(reset) %G? %C(bold blue)%an%C(reset) %s%C(bold cyan)%d%C(reset) %C(green)%cr.%C(reset) %n%n%b%n%N%-%n'
+	st = status
+	sw = switch
+	; review = log -p --reverse
+	review = "!f() { \
+	  git log --reverse --format=format:'%h' \"$1\" | \
+	  xargs -I {} /bin/bash -c \"cat <(git show --color --compact-summary {}) <(echo) <(git show --color --format='' {}) | less -R\"; \
+	}; f"
+	review-from = "!f() { \
+	  git log --reverse --format=format:'%h' \"$1..HEAD\" | \
+	  xargs -I {} /bin/bash -c \"cat <(git show --color --compact-summary {}) <(echo) <(git show --color --format='' {}) | less -R\"; \
+	}; f"
+[sendemail]
+	smtpserver = mail.privateemail.com
+	smtpuser = hello@ryanlue.com
+	smtpencryption = ssl
+	smtpserverport = 465
+[pull]
+	rebase = true
+[checkout]
+	defaultRemote = origin

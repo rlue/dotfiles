@@ -1,0 +1,4 @@
+{{- $headless := promptBoolOnce . "headless" "Is this a headless machine" -}}
+
+[data]
+  headless = {{ $headless }}

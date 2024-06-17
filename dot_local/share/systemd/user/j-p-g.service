@@ -1,0 +1,10 @@
+[Unit]
+Description=j-p-g.tumblr.com wallpaper fetcher
+After=network.target
+
+[Service]
+ExecStart=/home/rlue/.local/bin/j-p-g_wallpaper
+Restart=no
+
+[Install]
+WantedBy=default.target

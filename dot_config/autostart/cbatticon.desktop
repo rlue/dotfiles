@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=cbatticon
+GenericName=
+Comment=A lightweight and fast battery icon
+Exec=cbatticon -n
+Icon=cbatticon
+StartupNotify=true
+Type=Application
+Categories=System;Utility;
+Keywords=cbatticon;tray;system tray;applet;battery;

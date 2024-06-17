@@ -1,0 +1,13 @@
+{{- if eq .chezmoi.os "darwin" }} # --------------------------------------------
+function ls
+  if [ "$(pwd)" = "$HOME" ]
+    exa --ignore-glob="Applications|Desktop|Documents|Downloads|Movies|Music|Library|Pictures|Public" $argv
+  else
+    exa $argv
+  end
+end
+{{- else if eq .chezmoi.os "linux" }} # ----------------------------------------
+  function ls
+    exa $argv
+  end
+{{- end }}

@@ -1,0 +1,14 @@
+[Unit]
+Description=Photo/video import daemon
+
+[Service]
+Environment=MEDIAINFO_XML_PARSER=nokogiri
+ExecStart=/home/rlue/.rbenv/bin/rbenv exec xferase \
+  --inbox=/home/rlue/tmp/xferase/_inbox \
+  --staging=/home/rlue/tmp/xferase/_staging \
+  --lib-orig=/home/rlue/tmp/xferase/orig \
+  --lib-web=/home/rlue/tmp/xferase/web
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

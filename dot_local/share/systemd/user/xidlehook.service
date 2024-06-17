@@ -1,0 +1,11 @@
+[Unit]
+Description=Automatic Screen Locker
+
+[Service]
+Type=simple
+Environment=DISPLAY=:0
+Environment=XIDLEHOOK_SOCK=%t/xidlehook.socket
+ExecStart=/home/rlue/.cargo/bin/xidlehook --not-when-audio --not-when-fullscreen --socket $XIDLEHOOK_SOCK --timer 300 'sh -c "/usr/bin/i3-msg bar hidden_state hide; /usr/bin/dunstctl set-paused true; /usr/local/bin/i3lock --nofork --color=000000 --pass-volume --pass-screen-keys --ignore-empty-password --screen=1; /usr/bin/dunstctl set-paused false"; /usr/bin/i3-msg bar hidden_state show' ''
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,90 @@
+#!/usr/bin/env ruby
+
+require 'uri'
+require 'net/http'
+require 'json'
+require 'colorize'
+require 'optparse'
+require 'io/console'
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = <<~BANNER
+  moedict -- look up Chinese words on moedict.tw
+
+  Usage: moedict [query]
+
+  use `-' to read the query from STDIN
+
+  BANNER
+
+  opts.on('-i', '--interactive', 'Wait for user input before exiting') do |i|
+    options[:interactive] = i
+  end
+
+  opts.on('-', 'Read from STDIN') do |i|
+    options[:stdin] = i
+  end
+end.parse!
+
+if ARGV.first == '-' || ARGV.empty?
+  queries = []
+  queries << STDIN.gets.chomp until STDIN.eof?
+else
+  queries = ARGV
+end
+
+# rudimentary check for presence of Chinese characters
+if queries.none? { |char| char.bytes.length > 1 }
+  raise ArgumentError, 'query string contains no Chinese characters'
+end
+
+class Lookup
+  attr_reader :query, :uri, :response
+
+  QUERY_URL = "https://www.moedict.tw/a/%s.json"
+
+  def initialize(query)
+    @query    = query
+    @uri      = URI(QUERY_URL % URI.encode_www_form_component(query))
+    @response = JSON.load(Net::HTTP.get(uri))
+  rescue JSON::ParserError
+    STDERR.puts "#{query}: word not found".red
+  end
+
+  def zhuyin
+    response.dig('h', 0, 'b')
+  end
+
+  def entries
+    response.dig('h', 0, 'd')
+  end
+
+  def definitions
+    entries.map { |e| e['f'].gsub(/[~`]/, '') }
+  end
+
+  def found?
+    response
+  end
+end
+
+queries.each do |q|
+  word = Lookup.new(q)
+  next unless word.found?
+
+  heading = "#{word.query} (#{word.zhuyin})"
+
+  if $stdout.tty?
+    puts heading.green
+    puts heading.gsub(/./, '--').green
+  end
+
+  puts word.definitions.map.with_index { |d, i| "#{i+1}. #{d}" }
+end
+
+if options[:interactive]
+  printf "\nPress any key to exit"
+  STDIN.getch
+  puts
+end

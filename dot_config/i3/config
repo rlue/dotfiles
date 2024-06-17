@@ -1,0 +1,331 @@
+# i3 config file (v4) ==========================================================
+# Please see https://i3wm.org/docs/userguide.html for a complete reference!
+
+# Staging --------------------------------------------------------------------
+
+# Base -------------------------------------------------------------------------
+set $mod Mod4
+set $alt Mod1
+floating_modifier $mod
+
+# bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r restart
+bindsym $mod+Shift+e exec --no-startup-id "pkill -x timer; tail /tmp/timer.fifo", exit
+
+# Startup Services -------------------------------------------------------------
+# Start XDG autostart .desktop files using dex. See also
+# https://wiki.archlinux.org/index.php/XDG_Autostart
+exec --no-startup-id dex --autostart --environment i3 --search-paths $HOME/.config/autostart
+exec --no-startup-id compton -b --config ~/.config/compton/compton.conf
+# exec --no-startup-id TIMER_VOLUME=0 timer -d $(echo "1800 - $(date +%s) % 1800" | bc) -p 29.5 0.5 29.5 0.5 20 10
+exec_always --no-startup-id feh --bg-center /usr/share/wallpapers/wallpaper.jpg
+exec_always --no-startup-id pkill keynav; keynav
+exec --no-startup-id autorandr --change
+
+# Appearance -------------------------------------------------------------------
+
+bar {
+  i3bar_command   i3bar --transparency
+  mode            hide
+  hidden_state    show
+  status_command  date +%R; while sleep 1; do [ -p /tmp/timer.fifo ] && tail -n1 /tmp/timer.fifo || date +%R; done
+  position        top
+  font            pango:Inter Light 15
+  tray_output     primary
+  tray_padding    4px
+  colors {
+    separator          #AAAAAA
+    background         #00000033
+    statusline         #FFFFFF
+    focused_workspace  #664477 #664477CC #CCCCCC
+    active_workspace   #DCCD69 #DCCD69CC #181715
+    inactive_workspace #222133 #222133CC #AAAAAA
+    urgent_workspace   #CE4045 #CE4045CC #FFFFFF
+  }
+  strip_workspace_numbers yes
+}
+
+# Desktop Interaction ----------------------------------------------------------
+bindsym $mod+q kill
+# see https://github.com/adi1090x/rofi for themes
+bindsym $mod+space exec --no-startup-id rofi -show-icons -modi drun -show drun -theme $HOME/.config/rofi/themes/style_5.rasi
+bindsym Print exec spectacle
+focus_follows_mouse no
+exec_always --no-startup-id sleep 0.5; xset r rate 200 50
+bindsym --release Print exec scrot --freeze --select --exec 'mv $f ~/tmp'
+bindsym XF86AudioMute exec "$HOME/.config/i3/bin/set_vol.sh mute"
+bindsym XF86AudioLowerVolume exec "$HOME/.config/i3/bin/set_vol.sh down"
+bindsym XF86AudioRaiseVolume exec "$HOME/.config/i3/bin/set_vol.sh up"
+bindsym XF86AudioMicMute exec "$HOME/.config/i3/bin/set_vol.sh mic-mute"
+bindsym XF86MonBrightnessDown exec "$HOME/.config/i3/bin/set_brightness.sh down"
+bindsym XF86MonBrightnessUp exec "$HOME/.config/i3/bin/set_brightness.sh up"
+
+# Power management
+bindsym $mod+Shift+Next exec --no-startup-id "pkill -x timer; tail /tmp/timer.fifo; systemctl poweroff"
+bindsym $mod+Shift+Prior exec --no-startup-id "pkill -x timer; tail /tmp/timer.fifo; systemctl reboot"
+exec --no-startup-id xset s off; xset dpms 0 0 300
+
+# xprop | grep CLASS
+for_window [instance="anki" title="^(?!User \d+ - Anki)"] floating enable
+for_window [instance="blueman-manager"] floating enable
+for_window [instance="blueman-services"] floating enable
+for_window [instance="fcitx5-config-qt"] floating enable
+for_window [instance="guvcview" title="^Guvcview$"] floating enable
+for_window [instance="jetbrains-client" title="^(?!Code With Me – )"] floating enable
+for_window [instance="jetbrains-idea" title="splash"] floating enable
+for_window [instance="jetbrains-idea" title="^ $"] floating enable
+for_window [class="^thunderbird$" instance="^Msgcompose$"] floating enable
+for_window [class="^thunderbird$" title="^About Mozilla Thunderbird$"] floating enable
+for_window [instance="kdeconnect.app"] floating enable
+for_window [instance="kdenlive" title="Warning — Kdenlive"] floating enable
+for_window [instance="nm-connection-editor"] floating enable
+for_window [instance="steam" title="^Steam Settings$"] floating enable
+for_window [instance="qt5ct"] floating enable
+for_window [class="zoom" title="^(?!Zoom Meeting)"] floating enable
+
+# Window Navigation ------------------------------------------------------------
+focus_wrapping no
+bindsym $mod+h exec --no-startup-id /home/rlue/.config/i3/bin/fullscreen_nav.sh focus left
+bindsym $mod+j exec --no-startup-id /home/rlue/.config/i3/bin/fullscreen_nav.sh focus down
+bindsym $mod+k exec --no-startup-id /home/rlue/.config/i3/bin/fullscreen_nav.sh focus up
+bindsym $mod+l exec --no-startup-id /home/rlue/.config/i3/bin/fullscreen_nav.sh focus right
+bindsym $mod+Left exec --no-startup-id /home/rlue/.config/i3/bin/fullscreen_nav.sh focus left
+bindsym $mod+Down exec --no-startup-id /home/rlue/.config/i3/bin/fullscreen_nav.sh focus down
+bindsym $mod+Up exec --no-startup-id /home/rlue/.config/i3/bin/fullscreen_nav.sh focus up
+bindsym $mod+Right exec --no-startup-id /home/rlue/.config/i3/bin/fullscreen_nav.sh focus right
+# bindsym $mod+a focus parent
+# bindsym $mod+d focus child
+
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+bindsym $mod+Shift+c move position center
+
+bindsym $mod+v split h
+bindsym $mod+w split v
+
+# Full-screen + Do-Not-Disturb mode:
+# F11       → toggle full-screen, but show i3bar and notifications
+# Shift+F11 → enable full-screen, and hide i3bar and notifications
+bindsym F11 fullscreen toggle, bar hidden_state show, exec --no-startup-id dunstctl set-paused false
+bindsym Shift+F11 fullscreen enable, bar hidden_state hide, exec --no-startup-id dunstctl set-paused true
+
+bindsym $mod+s layout stacking
+bindsym $mod+t layout tabbed
+bindsym $mod+e layout toggle split
+
+# floating
+bindsym $mod+f floating toggle
+bindsym $mod+Shift+f focus mode_toggle
+
+bindsym $mod+r mode "resize"
+
+mode "resize" {
+        bindsym h resize shrink width 10 px or 10 ppt
+        bindsym j resize grow height 10 px or 10 ppt
+        bindsym k resize shrink height 10 px or 10 ppt
+        bindsym l resize grow width 10 px or 10 ppt
+
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym $mod+r mode "default"
+}
+
+# Workspace Navigation ---------------------------------------------------------
+# Define names for default workspaces for which we configure key bindings later on.
+# We use variables to avoid repeating the names in multiple places.
+set $ws1 "1:壹"
+set $ws2 "2:貳"
+set $ws3 "3:參"
+set $ws4 "4:肆"
+set $ws5 "5:伍"
+set $ws6 "6:陸"
+set $ws7 "7:柒"
+set $ws8 "8:捌"
+set $ws9 "9:玖"
+set $ws0 "10:零"
+
+# switch to workspace
+bindsym $mod+grave workspace back_and_forth
+bindsym $mod+Tab workspace next
+bindsym $mod+Shift+Tab workspace prev
+bindsym $mod+1 workspace $ws1
+bindsym $mod+2 workspace $ws2
+bindsym $mod+3 workspace $ws3
+bindsym $mod+4 workspace $ws4
+bindsym $mod+5 workspace $ws5
+bindsym $mod+6 workspace $ws6
+bindsym $mod+7 workspace $ws7
+bindsym $mod+8 workspace $ws8
+bindsym $mod+9 workspace $ws9
+bindsym $mod+0 workspace $ws0
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace $ws1
+bindsym $mod+Shift+2 move container to workspace $ws2
+bindsym $mod+Shift+3 move container to workspace $ws3
+bindsym $mod+Shift+4 move container to workspace $ws4
+bindsym $mod+Shift+5 move container to workspace $ws5
+bindsym $mod+Shift+6 move container to workspace $ws6
+bindsym $mod+Shift+7 move container to workspace $ws7
+bindsym $mod+Shift+8 move container to workspace $ws8
+bindsym $mod+Shift+9 move container to workspace $ws9
+bindsym $mod+Shift+0 move container to workspace $ws0
+
+# Launchers --------------------------------------------------------------------
+# adapted from https://faq.i3wm.org/question/6460/move-caja-to-scratchpad-on-start
+# exec --no-startup-id i3-msg "[instance=Alacritty] mark alacritty_scratch, move scratchpad, resize set 1700 800"
+# bindsym $mod+Return [con_mark="^alacritty_scratch$"] scratchpad show, move position center
+# for_window [instance="kalendar_scratch" window_type="normal"] move scratchpad
+# exec_always --no-startup-id pgrep -x kalendar || kalendar --name kalendar_scratch
+# bindsym $mod+Return [instance="kalendar_scratch"] scratchpad show
+
+# for_window [instance="anki"] move scratchpad, scratchpad show
+# for_window [instance="anki" title="User 1 - Anki"] scratchpad show
+# for_window [instance="anki" title="Syncing..."] scratchpad show
+# exec_always --no-startup-id pgrep -x anki || anki
+# bindsym $mod+a [instance="anki"] scratchpad show
+
+# for_window [instance="emojier_scratch" window_type="normal"] move scratchpad
+# exec_always --no-startup-id pgrep -x ibus-ui-emojier || ibus-ui-emojier-plasma --name emojier_scratch
+# bindsym $mod+period [instance="emojier_scratch"] scratchpad show
+
+# for_window [instance="otpclient_scratch" window_type="normal"] move scratchpad, scratchpad show
+# for_window [instance="otpclient_scratch" title="Password"] move scratchpad
+# exec_always --no-startup-id pgrep -x otpclient || otpclient --name otpclient_scratch
+# bindsym $mod+o [instance="otpclient_scratch"] scratchpad show
+
+bindsym $mod+slash exec --no-startup-id ntf-moedict
+bindsym $mod+equal exec --no-startup-id znt-anki-sentences
+
+font pango: 0
+
+# i3-gaps ----------------------------------------------------------------------
+for_window [class="^.*"] border pixel 0
+smart_gaps inverse_outer
+smart_borders on
+gaps horizontal 2
+gaps inner 12
+
+# Gaps mode
+set $mode_gaps Gaps: (o)uter, (i)nner, (h)orizontal, (v)ertical, (t)op, (r)ight, (b)ottom, (l)eft
+set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_inner Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_horiz Horizontal Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_verti Vertical Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_top Top Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_right Right Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_bottom Bottom Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_left Left Gaps: +|-|0 (local), Shift + +|-|0 (global)
+bindsym $mod+Shift+g mode "$mode_gaps"
+
+mode "$mode_gaps" {
+        bindsym o      mode "$mode_gaps_outer"
+        bindsym i      mode "$mode_gaps_inner"
+        bindsym h      mode "$mode_gaps_horiz"
+        bindsym v      mode "$mode_gaps_verti"
+        bindsym t      mode "$mode_gaps_top"
+        bindsym r      mode "$mode_gaps_right"
+        bindsym b      mode "$mode_gaps_bottom"
+        bindsym l      mode "$mode_gaps_left"
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+
+mode "$mode_gaps_outer" {
+        bindsym plus  gaps outer current plus 5
+        bindsym minus gaps outer current minus 5
+        bindsym 0     gaps outer current set 0
+
+        bindsym Shift+plus  gaps outer all plus 5
+        bindsym Shift+minus gaps outer all minus 5
+        bindsym Shift+0     gaps outer all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_inner" {
+        bindsym plus  gaps inner current plus 5
+        bindsym minus gaps inner current minus 5
+        bindsym 0     gaps inner current set 0
+
+        bindsym Shift+plus  gaps inner all plus 5
+        bindsym Shift+minus gaps inner all minus 5
+        bindsym Shift+0     gaps inner all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_horiz" {
+        bindsym plus  gaps horizontal current plus 5
+        bindsym minus gaps horizontal current minus 5
+        bindsym 0     gaps horizontal current set 0
+
+        bindsym Shift+plus  gaps horizontal all plus 5
+        bindsym Shift+minus gaps horizontal all minus 5
+        bindsym Shift+0     gaps horizontal all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_verti" {
+        bindsym plus  gaps vertical current plus 5
+        bindsym minus gaps vertical current minus 5
+        bindsym 0     gaps vertical current set 0
+
+        bindsym Shift+plus  gaps vertical all plus 5
+        bindsym Shift+minus gaps vertical all minus 5
+        bindsym Shift+0     gaps vertical all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_top" {
+        bindsym plus  gaps top current plus 5
+        bindsym minus gaps top current minus 5
+        bindsym 0     gaps top current set 0
+
+        bindsym Shift+plus  gaps top all plus 5
+        bindsym Shift+minus gaps top all minus 5
+        bindsym Shift+0     gaps top all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_right" {
+        bindsym plus  gaps right current plus 5
+        bindsym minus gaps right current minus 5
+        bindsym 0     gaps right current set 0
+
+        bindsym Shift+plus  gaps right all plus 5
+        bindsym Shift+minus gaps right all minus 5
+        bindsym Shift+0     gaps right all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_bottom" {
+        bindsym plus  gaps bottom current plus 5
+        bindsym minus gaps bottom current minus 5
+        bindsym 0     gaps bottom current set 0
+
+        bindsym Shift+plus  gaps bottom all plus 5
+        bindsym Shift+minus gaps bottom all minus 5
+        bindsym Shift+0     gaps bottom all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_left" {
+        bindsym plus  gaps left current plus 5
+        bindsym minus gaps left current minus 5
+        bindsym 0     gaps left current set 0
+
+        bindsym Shift+plus  gaps left all plus 5
+        bindsym Shift+minus gaps left all minus 5
+        bindsym Shift+0     gaps left all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}

@@ -1,0 +1,13 @@
+# per https://bbs.archlinux.org/viewtopic.php?pid=1165168#p1165168
+
+[Unit]
+Description=Digital Photo Transfer for Ricoh GR
+BindsTo=dev-disk-by\x2dlabel-RICOH_GR.device
+After=dev-disk-by\x2dlabel-RICOH_GR.device
+
+[Service]
+ExecStart=/bin/sh -c 'mount /media/ricoh_gr; photein --recursive --source /media/ricoh_gr/DCIM/ --library-desktop /home/rlue/memories/ --library-web /home/rlue/tmp; umount /media/ricoh_gr'
+Restart=no
+
+[Install]
+WantedBy=dev-disk-by\x2dlabel-RICOH_GR.device

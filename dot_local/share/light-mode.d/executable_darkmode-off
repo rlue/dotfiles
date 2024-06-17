@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo 0 > "${HOME}/.config/darkmode"
+
+# GTK
+sed --in-place --follow-symlinks 's/\(Net\/ThemeName ".*\)-Dark"/\1"/' "${HOME}/.config/xsettingsd"
+pkill -HUP -x xsettingsd
+
+# Alacritty
+# alacritty_conf="${HOME}/.config/alacritty/alacritty.yml"
+# light_theme="${HOME}/.config/alacritty/alacritty.seoul256-light.yml"
+# ln -f "$light_theme" "$alacritty_conf"
+
+# tmux
+# tmux set-option -g status-bg darkgrey

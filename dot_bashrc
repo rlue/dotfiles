@@ -1,0 +1,7 @@
+# Load .bashrc as modules ======================================================
+# adapted from https://waxzce.medium.com/_-50204d5389ff
+for file in "$HOME"/.config/bashrc.d/*.bash; do
+  source "$file"
+done
+
+# vim: ft=bash

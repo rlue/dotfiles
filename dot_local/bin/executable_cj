@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'pathname'
+
+CJ_TABLE_PATH = Pathname.new(__dir__) + '../data/zh-tw/cangjie_table'
+
+module CangjieMap
+  IM_TABLE_RAW = begin
+                   File.readlines(CJ_TABLE_PATH).freeze
+                 rescue Errno::ENOENT
+                   STDERR.puts(<<~ERR.chomp)
+                     Input method table not found.
+                     Download it from https://www.apt-browse.org/browse/debian/wheezy/main/all/openvanilla-imgeneric-data-zh-tw/0.9.0a1.3+dfsg1-2.1/file/usr/share/openvanilla/OVIMGeneric/cj5.cin
+                   ERR
+                   raise
+                 end
+
+  module Radicals
+    ROM_TO_CJ_MAP = IM_TABLE_RAW[12..37].map(&:split).to_h.freeze
+    CJ_TO_ROM_MAP = IM_TABLE_RAW[12..37].map(&:split).map(&:reverse).to_h.freeze
+
+    def self.lookup_cj(rom)
+      ROM_TO_CJ_MAP[rom.downcase]
+    end
+  end
+
+  module Characters
+    CJ_TO_HZ_MAP = IM_TABLE_RAW[135..-2].map(&:split).to_h.freeze
+    HZ_TO_CJ_MAP = IM_TABLE_RAW[135..-2].map(&:split).map(&:reverse).to_h.freeze
+
+    def self.lookup_cj(hanzi)
+      HZ_TO_CJ_MAP[hanzi]
+    end
+  end
+end
+
+raw_input = ARGV.first || STDIN.gets.chomp
+raise ArgumentError, 'No input detected' if raw_input.nil? || raw_input.empty?
+
+input_chars = raw_input.split('').uniq.select { |c| c.match?(/\p{Han}/) }
+raise ArgumentError, 'No chinese characters in input' if input_chars.empty?
+
+lookup_results = input_chars.map(&CangjieMap::Characters.method(:lookup_cj))
+                            .map { |comp| comp.split('') }
+                            .map { |keys| keys.map(&CangjieMap::Radicals.method(:lookup_cj)) }
+                            .map(&:join)
+
+puts input_chars.zip(lookup_results)
+                .map { |line| line.join(' ') }
+                .push('')
+                .join("\n")

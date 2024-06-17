@@ -1,0 +1,7 @@
+# vim: filetype=muttrc
+
+set realname  = "Ryan Lue"
+set from      = "hello@ryanlue.com"
+set sendmail  = "msmtp -a hello"
+set record    = "=<<Hello>>"
+set spoolfile = "=<<Hello>>"

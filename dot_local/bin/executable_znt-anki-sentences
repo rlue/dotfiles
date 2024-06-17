@@ -1,0 +1,31 @@
+#!/bin/bash
+# adapted from https://github.com/4lgn/word-lookup
+
+usage(){
+	echo "Usage: $(basename "$0") [-h]
+	Looks up the definition of currently selected word.
+
+	-w	Use the wayland clipboard (instead of X11) "
+
+}
+
+USEWAYLAND=false
+OUTFILE="$HOME/notes/study/znt-anki-sentences.csv"
+
+while getopts 'hw' c
+do
+  case $c in
+    h) usage; exit ;;
+    w) USEWAYLAND=true ;;
+    *) usage; exit 1 ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+sentence=$([ $USEWAYLAND = true ] && wl-paste -p || xclip -o)
+
+zenity  --title "Flashcard Builder" --entry --text "Enter your target vocabulary words (space-separated)" --entry-text "$sentence" \
+  | tr " " "\n" \
+  | awk 'BEGIN {OFS=","} { $2="'$sentence'" } { sub($1, "～", $2) }1' \
+  | cram append:zhuyin --no-strict >> "$OUTFILE"

@@ -1,0 +1,174 @@
+# ACCOUNTS ====================================================================
+
+# ryan.lue@gmail.com ----------------------------------------------------------
+IMAPAccount gmail
+Host imap.gmail.com
+Port 993
+User ryan.lue
+PassCmd "pass web/email/ryan.lue@gmail.com"
+AuthMechs LOGIN
+SSLType IMAPS
+SSLVersions TLSv1.2
+
+# hello@ryanlue.com -----------------------------------------------------------
+IMAPAccount hello
+Host mail.privateemail.com
+Port 993
+User hello@ryanlue.com
+PassCmd "pass web/email/hello@ryanlue.com"
+AuthMechs LOGIN
+SSLType IMAPS
+SSLVersions TLSv1.2
+
+# lists@ryanlue.com -----------------------------------------------------------
+IMAPAccount lists
+Host mail.privateemail.com
+Port 993
+User lists@ryanlue.com
+PassCmd "pass web/email/lists@ryanlue.com"
+AuthMechs LOGIN
+SSLType IMAPS
+SSLVersions TLSv1.2
+
+# zero@ltra.in ----------------------------------------------------------------
+IMAPAccount ltrain
+Host mail.privateemail.com
+Port 993
+User zero@ltra.in
+PassCmd "pass web/email/zero@ltra.in"
+AuthMechs LOGIN
+SSLType IMAPS
+SSLVersions TLSv1.2
+
+# STORES ======================================================================
+
+IMAPStore gmail
+Account gmail
+
+IMAPStore hello
+Account hello
+
+IMAPStore lists
+Account lists
+
+IMAPStore ltrain
+Account ltrain
+
+MaildirStore local
+Path ~/mail/
+Inbox ~/mail/\<\<Gmail\>\>
+Flatten "."
+SubFolders Verbatim
+
+# CHANNELS ====================================================================
+
+Channel hello
+Far :hello:INBOX
+Near :local:<<Hello>>
+Create Near
+Expunge Both
+SyncState *
+
+Channel lists
+Far :lists:INBOX
+Near :local:<Lists>
+Create Near
+Expunge Both
+SyncState *
+CopyArrivalDate yes
+
+Channel ltrain
+Far :ltrain:INBOX
+Near :local:<ltrain>
+Create Near
+Expunge Both
+SyncState *
+CopyArrivalDate yes
+
+Channel gmail-inbox
+Far :gmail:INBOX
+Near :local:<<Gmail>>
+Create Near
+Expunge Both
+SyncState *
+CopyArrivalDate yes
+
+Channel gmail-drafts
+Far :gmail:"[Gmail]/Drafts"
+Near :local:<Drafts>
+Create Near
+Expunge Both
+SyncState *
+CopyArrivalDate yes
+
+Channel gmail-sent
+Far :gmail:"[Gmail]/Sent Mail"
+Near :local:<Sent>
+Create Near
+Expunge Both
+SyncState *
+CopyArrivalDate yes
+
+Channel gmail-spam
+Far :gmail:"[Gmail]/Spam"
+Near :local:<Spam>
+Create Near
+Expunge Both
+SyncState *
+CopyArrivalDate yes
+
+Channel gmail-deferred
+Far :gmail:"Deferred"
+Near :local:<Deferred>
+Create Near
+Expunge Both
+SyncState *
+CopyArrivalDate yes
+
+Channel gmail-dumplock
+Far :gmail:"Dump Lock"
+Near :local:<Dump-Lock>
+Create Near
+Expunge Both
+SyncState *
+CopyArrivalDate yes
+
+Channel gmail-trash
+Far :gmail:"[Gmail]/Trash"
+Near :local:<Trash>
+Create Near
+Expunge Both
+SyncState *
+CopyArrivalDate yes
+
+Channel gmail-labels
+Far :gmail:
+Near :local:
+Patterns * !"%" ![Gmail]/*
+Create Both
+Remove Both
+Expunge Both
+SyncState *
+CopyArrivalDate yes
+
+# GROUPS ======================================================================
+
+Group inboxes
+Channel hello
+Channel lists
+Channel ltrain
+Channel gmail-inbox
+Channel gmail-drafts
+Channel gmail-sent
+Channel gmail-deferred
+Channel gmail-dumplock
+
+Group gmail
+Channel gmail-inbox
+Channel gmail-drafts
+Channel gmail-sent
+Channel gmail-spam
+Channel gmail-deferred
+Channel gmail-dumplock
+Channel gmail-trash
+Channel gmail-labels

@@ -1,0 +1,131 @@
+#!/bin/bash
+
+# This script clears the current session
+# for a given Firefox profile (or all profiles)
+# belonging to the current user.
+#
+# More precisely, it:
+#
+#   * closes all regular tabs
+#   * keeps all pinned tabs (but clears their history)
+#   * creates a backup of the destroyed session under
+#     $HOME/.mozilla/firefox/$profile/sessionstore-backups/flush.jsonlz4-$timestamp
+#
+# It is intended to be run periodically
+# to encourage the user to proactively prune browser tabs
+# instead of letting them accumulate over time
+# (à la Inbox Zero).
+#
+# Written for Linux.
+#
+# Usage
+# -----
+#
+# ### Manual
+#
+#     # clears the session for a single profile ("default" if none specified)
+#     ffs flush [<profile_name>]
+#
+#     # clears the session for all profiles
+#     ffs flushall
+#
+#     # restores the most recent session for a single profile ("default" if none specified)
+#     ffs restore [<profile_name>]
+#
+# Command-line arguments are case-sensitive.
+#
+# ### With a systemd timer (Recommended)
+#
+# 1. Create `~/.local/share/systemd/user/ffs-flush.timer`:
+#
+#        [Unit]
+#        Description=Firefox session flush timer
+#
+#        [Timer]
+#        OnCalendar=Mon *-*-* 03:00:00
+#        Persistent=yes
+#
+#        [Install]
+#        WantedBy=timers.target
+#
+#    (The `Persistent` directive will cause the service to run at boot time
+#    if it was powered off during the last time it was supposed to run.)
+#
+# 2. Create `~/.local/share/systemd/user/ffs-flush.service`:
+#
+#        [Unit]
+#        Description=Firefox session flush service
+#
+#        [Service]
+#        ExecStart=/home/rlue/.local/bin/ffs flush
+#        Restart=no
+#
+# 3. Enable:
+#
+#        $ systemctl --user daemon-reload
+#        $ systemctl --user enable ffs-flush.timer
+#
+# Dependencies
+# ------------
+#
+# * jq
+# * mozlz4 (https://github.com/jusw85/mozlz4)
+
+timestamp="$(date +%Y%m%d%H%M%S)"
+helptext="$(cat <<EOF
+usage: ffs <command> [<profile_name>]
+
+Commands:
+  flush     close all open tabs (except for pinned tabs) for a given profile
+  flushall  close all open tabs (except for pinned tabs) for all profiles
+  restore   restore the most recent session for a given profile
+
+Commands use profile "default" unless otherwise specified.
+EOF
+)"
+
+flush_cmd="$(cat <<EOF
+# remove session recovery files
+rm -rf "{}/sessionstore.jsonlz4"
+rm -rf "{}/sessionstore-backups/previous.jsonlz4"
+rm -rf "{}/sessionstore-backups/recovery.baklz4"
+
+# backup current session
+mv "{}/sessionstore-backups/recovery.jsonlz4" "{}/sessionstore-backups/flush.jsonlz4-$timestamp"
+
+# flush non-pinned tabs from current session
+mozlz4 -x "{}/sessionstore-backups/flush.jsonlz4-$timestamp" \
+  | jq --compact-output ".windows[].tabs |= map(select(.pinned)) | .windows[].tabs[] |= del(.entries[1:]) | .windows[]._closedTabs = []" \
+  | mozlz4 -z - "{}/sessionstore-backups/recovery.jsonlz4"
+EOF
+)"
+
+if [ -z ${1+x} ]; then
+  echo "$helptext" >&2
+  exit 1
+else
+  if [ -z ${2+x} ]; then
+    profile='default'
+  else
+    profile=$2
+  fi
+
+  case $1 in
+    flush|flushall)
+      find "${HOME}/.mozilla/firefox" -mindepth 1 -maxdepth 1 -type d -name "????????.$([ $1 = flush ] && echo $profile || echo '*')" -exec sh -c "$flush_cmd" \;
+      exit
+      ;;
+    restore)
+      profile_dir="$(ls -d "${HOME}/.mozilla/firefox/"????????".${profile}")"
+      backup_file=$(ls "${profile_dir}/sessionstore-backups/flush.jsonlz4"* | tail --lines=1)
+      rm "${profile_dir}/sessionstore.jsonlz4"
+      cp "$backup_file" "${profile_dir}/sessionstore-backups/recovery.jsonlz4"
+      exit
+      ;;
+    *)
+      echo "$helptext" >&2
+      exit 1
+      ;;
+  esac
+  exit 1
+fi

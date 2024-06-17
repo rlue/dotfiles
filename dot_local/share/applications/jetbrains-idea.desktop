@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=IntelliJ IDEA Ultimate Edition
+Icon=/opt/idea-IU/bin/idea.svg
+Exec=/usr/bin/rofi -show 🧑‍💻 -modi 🧑‍💻:/home/rlue/.local/share/rofi/idea-project-dialog -theme /home/rlue/.config/rofi/themes/style_5.rasi
+Comment=Capable and Ergonomic IDE for JVM
+Categories=Development;IDE;
+Terminal=false
+StartupWMClass=jetbrains-idea
+StartupNotify=true

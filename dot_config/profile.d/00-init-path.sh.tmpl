@@ -1,0 +1,39 @@
+# TODO: Rewrite this for POSIX-compliance (no bash `case` statement)
+
+# Add directories to PATH explicitly, idempotently =============================
+
+{{ if eq .chezmoi.os "darwin" }}
+# Prevent tmux from recomposing PATH
+# per http://superuser.com/a/583502
+export PATH='' && . /etc/profile
+
+path_entries="$HOME/Library/Android/sdk/platform-tools"
+{{ else if eq .chezmoi.os "linux" }}
+path_entries="$HOME/.local/bin
+              /usr/lib/gnupg
+              /usr/local/bin 
+              /opt/firefox"
+{{ end }}
+
+while read -r dir; do
+  if [ -d "$dir" ]; then
+    case "$PATH" in
+      *"$dir:"*) :;;
+      *":$dir") :;;
+      *) export PATH="$dir:$PATH";;
+    esac
+  fi
+done <<-EOF
+  $path_entries
+  $HOME/.goenv/bin
+  $HOME/.goenv/shims
+  $HOME/.nodenv/bin
+  $HOME/.nodenv/shims
+  $HOME/.pyenv/bin
+  $HOME/.pyenv/shims
+  $HOME/.rbenv/bin
+  $HOME/.rbenv/shims
+  $HOME/.cargo/bin
+EOF
+
+unset path_entries

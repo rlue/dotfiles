@@ -1,0 +1,49 @@
+// Whitelist ===================================================================
+!/bin
+!/doc
+!/mail
+/mail/*/.mbsyncstate*
+!/notes
+!/share
+!/.local/etc/otpclient/
+
+// Whitelist: .config ----------------------------------------------------------
+// These files contain sensitive secrets and are ignored in the .config git repo
+!/.config/Transmission Remote GUI/transgui.ini
+!/.config/asciinema/install-id
+!/.config/gnubiff
+!/.config/gnupg
+!/.config/hub
+!/.config/pass
+!/.config/transmission-remote-gtk/config.json
+!/.config/.gem/credentials
+!/.config/.netrc
+!/.config/.ngrok2/ngrok.yml
+!/.config/.pocket-config
+!/.config/.pocket-index
+
+// General Exclusions ==========================================================
+// Mac OS metadata files
+(?d).DS_Store
+(?d)Icon
+(?d).localized
+
+// KDE metadata files
+(?d).directory
+
+// Android metadata files
+(?d).nomedia
+
+// Various temporary file patterns
+(?d)*.part
+(?d)tmp/
+(?d)*.tmp
+(?d)*.swp
+(?d)*.swo
+(?d)._*
+(?d).#*
+(?d)#*#
+(?d)*~
+
+// EXCLUDE EVERYTHING ELSE =====================================================
+/*

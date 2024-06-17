@@ -1,0 +1,100 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'pathname'
+
+CJ_TABLE_PATH = Pathname.new(__dir__) + '../data/zh-tw/cangjie_table'
+
+raise(Errno::ENOENT, <<~ERR.chomp) unless File.exist?(CJ_TABLE_PATH)
+  Input method table not found.
+  Download it from https://www.apt-browse.org/browse/debian/wheezy/main/all/openvanilla-imgeneric-data-zh-tw/0.9.0a1.3+dfsg1-2.1/file/usr/share/openvanilla/OVIMGeneric/cj5.cin
+  and save it to ../data/zh-tw/cangjie-table
+ERR
+
+# Classes ======================================================================
+module CangjieMap
+  IM_TABLE_RAW = File.readlines(CJ_TABLE_PATH).freeze
+
+  module Radicals
+    ROM_TO_CJ_MAP = IM_TABLE_RAW[12..37].map(&:split).to_h.freeze
+    CJ_TO_ROM_MAP = ROM_TO_CJ_MAP.to_a.map(&:reverse).to_h.freeze
+
+    def self.lookup_cj(rom)
+      ROM_TO_CJ_MAP[rom.downcase]
+    end
+  end
+
+  module Characters
+    CJ_TO_HZ_MAP = IM_TABLE_RAW[135..-2].map(&:split).to_h.freeze
+    HZ_TO_CJ_MAP = IM_TABLE_RAW[135..-2].map(&:split).map(&:reverse).to_h.freeze
+
+    def self.lookup_cj(hanzi)
+      HZ_TO_CJ_MAP[hanzi]
+    end
+  end
+end
+
+# Script =======================================================================
+# Setup ------------------------------------------------------------------------
+require 'optparse'
+
+OptionParser.new do |parser|
+  parser.on('-l', '--linewise') do
+    MODE = :lines
+  end
+end.parse!
+
+MODE ||= :chars
+
+OUTFILE = File.join(ENV['HOME'], 'notes', 'study', 'chinese', "cj-#{MODE}.csv")
+
+SEPARATOR = case MODE
+            when :chars
+              ''
+            when :lines
+              "\n"
+            end
+
+if ARGV.any?
+  infiles = ARGV.select(&File.method(:readable?))
+  raise ArgumentError, 'No readable files given' if infiles.empty?
+
+  raw_input = infiles.map(&File.method(:read)).join("\n")
+else
+  raw_input = ARGF.read
+end
+
+raise ArgumentError, 'No input detected' if raw_input.nil? || raw_input.empty?
+
+# Main logic -------------------------------------------------------------------
+input_text = raw_input.split(SEPARATOR)
+                      .uniq
+                      .select { |t| t.match?(/\p{Han}/) }
+                      .tap { |t| raise ArgumentError, 'No chinese characters in input' if t.empty? }
+
+previously_studied = File.readlines(OUTFILE).map { |l| l.split(',').first } if File.readable?(OUTFILE)
+input_text -= Array(previously_studied)
+
+lookup_results = case MODE
+                 when :chars
+                   input_text.map(&CangjieMap::Characters.method(:lookup_cj))
+                             .map { |comp| comp.split('') }
+                             .map { |keys| keys.map(&CangjieMap::Radicals.method(:lookup_cj)) }
+                             .map(&:join)
+                 when :lines
+                   input_text.map { |l| l.split('').select { |c| c.match?(/\p{Han}/) } }
+                             .map do |l|
+                               l.map(&CangjieMap::Characters.method(:lookup_cj))
+                                .map { |comp| comp.split('') }
+                                .map { |keys| keys.map(&CangjieMap::Radicals.method(:lookup_cj)) }
+                                .map(&:join)
+                             end.map { |comps| comps.join(' / ') }
+                 end
+
+output_text = input_text.map { |t| t.delete(',') }
+                        .zip(lookup_results)
+                        .map { |line| line.join(',') }
+                        .push('')
+                        .join("\n")
+
+File.write(OUTFILE, output_text, mode: 'a')

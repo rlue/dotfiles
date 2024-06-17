@@ -1,0 +1,28 @@
+#!/bin/sh
+# adapted from https://github.com/4lgn/word-lookup
+
+usage(){
+	echo "Usage: $(basename "$0") [-h]
+	Look up the contents of the clipboard in moedict
+	and display the results in a desktop notification.
+
+	-w	Use the wayland clipboard (instead of X11) "
+
+}
+
+USEWAYLAND=false
+
+while getopts 'hw' c
+do
+  case $c in
+    h) usage; exit ;;
+    w) USEWAYLAND=true ;;
+    *) usage; exit 1 ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+word=$([ $USEWAYLAND = true ] && wl-paste -p || xclip -o)
+
+notify-send --app-name=ntf-moedict --icon=preferences-system-search "$word" "$(moedict $word)"

@@ -1,0 +1,8 @@
+import = [
+"~/.config/alacritty/colors/juliana.toml",
+"~/.config/alacritty/fonts/pragmatapro_liga.toml",
+]
+
+[bell]
+color = "#27292c"
+duration = 80

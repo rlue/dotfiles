@@ -1,0 +1,46 @@
+{{- if ne .chezmoi.os "darwin" }} # --------------------------------------------
+.zshrc
+.config/zshrc.d
+.config/profile.d/10-platform.darwin.sh
+.config/skhd
+.config/yabai
+{{- else if ne .chezmoi.os "linux" }} # ----------------------------------------
+.config/autostart
+.config/compton
+.config/dunst
+.config/gtk-3.0
+.config/gtk-4.0
+.config/i3
+.config/profile.d/10-platform.linux.sh
+.gtkrc-2.0
+.keynavrc
+.local/share/applications
+.local/share/dark-mode.d
+.local/share/light-mode.d
+.local/share/mime
+.local/share/rofi
+.local/share/systemd
+.local/share/xsessions
+{{- end }}
+
+{{- if .headless }} # --------------------------------------------------
+.config/alacritty
+.config/autostart
+.config/compton
+.config/dunst
+.config/fish/completions/autorandr.fish
+.config/gtk-3.0
+.config/gtk-4.0
+.config/i3
+.gtkrc-2.0
+.keynavrc
+.local/share/applications
+.local/share/dark-mode.d
+.local/share/light-mode.d
+.local/share/rofi
+.local/share/systemd/user/ffs-flush.*
+.local/share/systemd/user/j-p-g.*
+.local/share/systemd/user/redshift.service
+.local/share/systemd/user/xidlehook.service
+.local/share/xsessions
+{{- end }}

@@ -1,0 +1,6 @@
+[ -r $HOME/.profile ] && source $HOME/.profile >/dev/null 2>&1
+
+# Source .bashrc if login shell is interactive
+[[ $- =~ i ]] && [ -r $HOME/.bashrc ] && source $HOME/.bashrc
+
+# vim: ft=sh

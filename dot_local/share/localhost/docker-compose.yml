@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  fava:
+    image: alexiri/fava
+    container_name: fava
+    environment:
+      BEANCOUNT_INPUT_FILE: /data/ledger.bean
+    volumes:
+      - $HOME/notes/ledger.bean:/data/ledger.bean:ro
+    ports:
+      - 5000:80
+    restart: unless-stopped

@@ -1,0 +1,9 @@
+[Unit]
+Description=Firefox session flush timer
+
+[Timer]
+OnCalendar=Mon *-*-* 03:00:00
+Persistent=yes
+
+[Install]
+WantedBy=timers.target

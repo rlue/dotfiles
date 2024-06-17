@@ -1,0 +1,134 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TODO: support YAML config file
+# TODO: support force destination
+# TODO: grab file list and output of du -a #{data_path} up front, in parallel
+#
+# fzf download files from the seedbox.
+# (or any ftp server... how to handle authentication?)
+#
+# for each selection:
+# --smart-dest
+#   assess the file type, and download to Music/ or Movies/ if appropriate
+# and run the appropriate command (mirror or pget)
+# based on whether a given selection is a regular file or a directory
+#
+# --dest
+#   specify where to save selections
+
+PORPHYRION = { name:      'porphyrion',
+               host:      'porphyrion.feralhosting.com',
+               user:      'illegalfiles',
+               data_path: 'private/transmission/data' }.freeze
+
+class RouteMapping
+  attr_reader :type, :local_path, :validator
+
+  def initialize(type, local_path, validator)
+    @type = type
+    @local_path = local_path
+    @validator = validator
+  end
+
+  DEFAULT_MAPPINGS = [
+    new(:music, '/vol/library/Music',
+        ->(file) { %w[.flac .m4a .mp3].include?(File.extname(file)) }),
+    new(:tv_shows, '/vol/library/Video/TV',
+        lambda do |file|
+          %w[.avi .mkv .mov .mp4].include?(File.extname(file)) &&
+          File.basename(file).match?(/s\d\de\d\d/i)
+        end),
+    new(:movies, '/vol/library/Video/Movies',
+        ->(file) { %w[.avi .mkv .mov .mp4].include?(File.extname(file)) }),
+    new(:book, '/vol/library/Books',
+        ->(file) { %w[.epub .mobi .pdf].include?(File.extname(file)) }),
+    new(:misc, File.join(ENV['HOME'], 'Downloads'), -> { true })
+  ].freeze
+
+  def self.all
+    DEFAULT_MAPPINGS
+  end
+
+  # TODO: make this logic more extensible
+  #       and less dependent on pre-existing route mappings
+  def self.find(remote_path:, server:)
+    filename = server.largest_file_at(remote_path)
+    all.find { |m| m.match?(filename) }
+  end
+
+  def match?(filename)
+    validator.call(filename)
+  end
+end
+
+class Server
+  attr_reader :name, :host, :user, :data_path
+
+  def initialize(server_params)
+    %i[name host user data_path].each do |var|
+      instance_variable_set("@#{var}", server_params[var])
+    end
+  end
+
+  def select_files
+    %x{ssh #{name} "ls -F #{data_path}" 2>/dev/null | fzf -m}.split("\n")
+  end
+
+  def largest_file_at(path)
+    File.basename(%x{ssh #{name} "find \\\"#{File.join(data_path, path)}\\\" \
+                                    -type f -exec du -h {} +" 2>/dev/null | \
+                                  sort -h | tail -n1 | cut -d'	' -f2}.chomp)
+  end
+end
+
+class Harvest
+  DL_SEGMENTS = 64
+
+  attr_reader :server, :route_mapper, :dl_targets, :routes
+
+  def initialize(server, route_mapper)
+    @server = server
+    @route_mapper = route_mapper
+    @dl_targets = server.select_files.tap { |t| exit if t.empty? }
+    route_targets
+  end
+
+  def fetch
+    system(shell_fetch_command)
+  end
+
+  private
+
+  # TODO: run ssh requests in parallel
+  def route_targets
+    @routes = dl_targets.each.with_object({}) do |f, routes|
+      route_mapping = route_mapper.find(remote_path: f, server: server)
+
+      (routes[route_mapping.local_path] ||= []).push(f)
+    end
+  end
+
+  def shell_fetch_command
+    lftp_commands = ["open -e \\\"cd #{server.data_path}\\\" \
+                           -u \\\"#{server.user}\\\" \
+                           \\\"#{server.host}\\\""]
+
+    routes.each do |path, targets|
+      lftp_commands << "lcd #{path}"
+      targets.each do |t|
+        lftp_commands << lftp_fetch_command(t)
+      end
+    end
+
+    %(lftp -c "#{lftp_commands.join('; ')}")
+  end
+
+  def lftp_fetch_command(target)
+    "queue #{target.end_with?('/') ? 'mirror --use-pget-n=' : 'pget -n '}" \
+      "#{DL_SEGMENTS} \\\"#{target}\\\""
+  end
+end
+
+porphyrion = Server.new(PORPHYRION)
+Harvest.new(porphyrion, RouteMapping).fetch

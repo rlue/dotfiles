@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo 1 > "${HOME}/.config/darkmode"
+
+# GTK
+sed --in-place --follow-symlinks 's/\(Net\/\(Icon\)\?ThemeName "\(Papirus\|Arc\)\)"/\1-Dark"/' "${HOME}/.config/xsettingsd"
+pkill -HUP -x xsettingsd
+
+# Alacritty
+alacritty_conf="${HOME}/.config/alacritty/alacritty.yml"
+dark_theme="${HOME}/.config/alacritty/alacritty.hybrid.yml"
+ln -f "$dark_theme" "$alacritty_conf"
+
+# tmux
+tmux set-option -g status-bg black

@@ -1,0 +1,6 @@
+[Unit]
+Description=Firefox session flush service
+
+[Service]
+ExecStart=/home/rlue/.local/bin/ffs flushall
+Restart=no
