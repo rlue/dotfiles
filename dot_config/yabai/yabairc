@@ -12,6 +12,7 @@ done
 yabai -m rule --add title="^Software Update$" manage=off
 yabai -m rule --add app="^Alacritty$" space=^1
 yabai -m rule --add app="^Anki$" title!="^User [[:digit:]]+ - Anki$" manage=off
+yabai -m rule --add app="^Archive Utility$" title="^Archive Utility$" manage=off
 yabai -m rule --add app="^Books$" title!="^All$" manage=off
 yabai -m rule --add app="^Cloudflare WARP$" manage=off
 yabai -m rule --add app="^DBeaver Community$" title="^Tip of the day$" manage=off
@@ -29,4 +30,5 @@ yabai -m rule --add app="^Skitch$" manage=off
 yabai -m rule --add app="^System Information$" title="^$" manage=off
 yabai -m rule --add app="^System Settings$" manage=off
 yabai -m rule --add app="^TeamViewer$" title="^TeamViewer$" manage=off
+yabai -m rule --add app="^Xournal\+\+$" title="^$" manage=off
 yabai -m rule --add app="^zoom.us$" title="^Zoom$" manage=off

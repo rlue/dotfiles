@@ -3,7 +3,7 @@ alias bj='bundle exec jekyll'
 
 # Support for local gemfiles via $BUNDLE_GEMFILE env var
 function bundle() {
-  bundle="$(type -P bundle)"
+  bundle="$(whence -p bundle)"
   project_root="$(git rev-parse --show-toplevel 2>/dev/null)/"
   local_gemfile="$(realpath "$BUNDLE_GEMFILE" 2>/dev/null)" # NOTE: not OSX-portable
 

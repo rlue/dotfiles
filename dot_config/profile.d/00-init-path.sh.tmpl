@@ -2,18 +2,21 @@
 
 # Add directories to PATH explicitly, idempotently =============================
 
-{{ if eq .chezmoi.os "darwin" }}
+{{ if eq .chezmoi.os "darwin" -}}
 # Prevent tmux from recomposing PATH
 # per http://superuser.com/a/583502
 export PATH='' && . /etc/profile
 
-path_entries="$HOME/Library/Android/sdk/platform-tools"
-{{ else if eq .chezmoi.os "linux" }}
+path_entries="$HOME/.local/bin
+              $HOME/Library/Android/sdk/platform-tools
+              /Applications/Wine\ Stable.app/Contents/Resources/start/bin
+              /Applications/Wine\ Stable.app/Contents/Resources/wine/bin"
+{{- else if eq .chezmoi.os "linux" -}}
 path_entries="$HOME/.local/bin
               /usr/lib/gnupg
               /usr/local/bin 
               /opt/firefox"
-{{ end }}
+{{- end }}
 
 while read -r dir; do
   if [ -d "$dir" ]; then

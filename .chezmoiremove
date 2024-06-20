@@ -1,17 +1,23 @@
 {{- if ne .chezmoi.os "darwin" }} # --------------------------------------------
+.zprofile
 .zshrc
 .config/zshrc.d
 .config/profile.d/10-platform.darwin.sh
 .config/skhd
 .config/yabai
+.config/Transmission Remote GUI
 {{- else if ne .chezmoi.os "linux" }} # ----------------------------------------
 .config/autostart
 .config/compton
 .config/dunst
+.config/fish/completions/autorandr.fish
 .config/gtk-3.0
 .config/gtk-4.0
 .config/i3
 .config/profile.d/10-platform.linux.sh
+.config/transmission-remote-gtk
+.config/user-dirs.dirs
+.config/user-dirs.defaults
 .gtkrc-2.0
 .keynavrc
 .local/share/applications
@@ -32,6 +38,8 @@
 .config/gtk-3.0
 .config/gtk-4.0
 .config/i3
+.config/transmission-remote-gtk
+.gem
 .gtkrc-2.0
 .keynavrc
 .local/share/applications

@@ -6,3 +6,9 @@ import = [
 [bell]
 color = "#27292c"
 duration = 80
+
+{{- if eq .chezmoi.os "darwin" }}
+
+[window]
+option_as_alt = "OnlyLeft"
+{{- end }}
