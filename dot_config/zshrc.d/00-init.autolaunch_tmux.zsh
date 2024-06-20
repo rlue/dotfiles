@@ -5,10 +5,12 @@ if [ -z "$SSH_CONNECTION" ] && [ "$XDG_SESSION_TYPE" != tty ]; then
     fi
 
     if type tmux >/dev/null 2>&1; then
-      if tmux ls 2>/dev/null | grep -i work: >/dev/null 2>&1; then
-        tmux attach -t "*[wW][oO][rR][kK]" # for compatibility with rlue/utils/timer
+      if tmux ls 2>/dev/null | $(whence -p grep) -qEv "\(attached\)$"; then
+        tmux attach
+      elif tmux ls 2>/dev/null | $(whence -p grep) -q work; then
+        tmux new
       else
-        tmux new -As work
+        tmux new -s work
       fi
     fi
   else # initialize tmux plugins (if possible)

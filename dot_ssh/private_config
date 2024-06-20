@@ -1,27 +1,27 @@
 # from http://blog.osv.io/blog/2014/11/17/ssh-without-trusting-bastion-host/
 Host          shibori.ryanlue.com
-ProxyCommand  ssh -q ryanlue.com nc shibori.local 22
-User          rlue
-VisualHostKey yes
+  ProxyCommand  ssh -q ryanlue.com nc shibori.local 22
+  User          rlue
+  VisualHostKey yes
 
 Host          heather
-HostName      ha.ltra.in
-Port          2222
-VisualHostKey yes
+  HostName      ha.ltra.in
+  Port          2222
+  VisualHostKey yes
 
 Host          porphyrion
-HostName      porphyrion.feralhosting.com
-User          illegalfiles
-VisualHostKey yes
+  HostName      porphyrion.feralhosting.com
+  User          illegalfiles
+  VisualHostKey yes
 
 Host          gossamer
-HostName      ltra.in
-Port          2222
-VisualHostKey yes
+  HostName      ltra.in
+  Port          2222
+  VisualHostKey yes
 
 Host          paisley
-HostName      46.226.105.138
-Port          22
-VisualHostKey yes
+  HostName      46.226.105.138
+  Port          22
+  VisualHostKey yes
 
 # vim: ft=sshconfig

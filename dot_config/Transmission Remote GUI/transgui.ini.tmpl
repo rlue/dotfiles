@@ -1,0 +1,15 @@
+[Hosts]
+CurHost=Seedbox
+Count=1
+Host1=Seedbox
+
+[Connection.Seedbox]
+Host=porphyrion.feralhosting.com
+UseSSL=1
+Port=443
+UserName=illegalfiles
+Password={{ pass "dotfiles/dot_config/Transmission Remote GUI/transgui.ini/seedbox.password" }}
+RpcPath=/illegalfiles/transmission/rpc
+
+[AddTorrent.Seedbox]
+Folder0=/media/sdu1/illegalfiles/private/transmission/ryan

@@ -119,14 +119,14 @@ shift + alt - l : yabai -m window --swap east || \
 # cycle through non-empty spaces
 alt - tab : ( \
         this_display="$(yabai -m query --displays --display | jq .id)"; \
-        this_space="$(yabai -m query --spaces --space | jq .id)"; \
-        yabai -m space --focus "$(yabai -m query --spaces --display $this_display | jq -e "first(.[] | select((.windows | length != 0) and (.id > $this_space))).index")" \
+        this_space="$(yabai -m query --spaces --space | jq .index)"; \
+        yabai -m space --focus "$(yabai -m query --spaces --display $this_display | jq -e "first(.[] | select((.windows | length != 0) and (.index > $this_space))).index")" \
         || yabai -m space --focus "$(yabai -m query --spaces --display $this_display | jq -e 'first(.[] | select(.windows | length != 0).index)')" \
     )
 alt + shift - tab : ( \
         this_display="$(yabai -m query --displays --display | jq .id)"; \
-        this_space="$(yabai -m query --spaces --space | jq .id)"; \
-        yabai -m space --focus "$(yabai -m query --spaces --display $this_display | jq -e "last(.[] | select((.windows | length != 0) and (.id < $this_space))).index")" \
+        this_space="$(yabai -m query --spaces --space | jq .index)"; \
+        yabai -m space --focus "$(yabai -m query --spaces --display $this_display | jq -e "last(.[] | select((.windows | length != 0) and (.index < $this_space))).index")" \
         || yabai -m space --focus "$(yabai -m query --spaces --display $this_display | jq -e 'last(.[] | select(.windows | length != 0).index)')" \
     )
 

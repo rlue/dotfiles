@@ -5,10 +5,12 @@ if [ -z "$SSH_CONNECTION" ] && [ "$XDG_SESSION_TYPE" != tty ]; then
     fi
 
     if type tmux >/dev/null 2>&1; then
-      if [ -z "$(tmux list-clients -t work 2>/dev/null)" ]; then
-        tmux attach-session
-      else
+      if tmux ls 2>/dev/null | $(type -P grep) -qEv "\(attached\)$"; then
+        tmux attach
+      elif tmux ls 2>/dev/null | $(type -P grep) -q work; then
         tmux new
+      else
+        tmux new -s work
       fi
     fi
   else # initialize tmux plugins (if possible)

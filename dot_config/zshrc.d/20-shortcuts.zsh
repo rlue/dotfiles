@@ -3,8 +3,8 @@ hash broot         >/dev/null 2>&1 && eval "$(broot --print-shell-function zsh)"
 hash git           >/dev/null 2>&1 && alias cdr='git status >/dev/null 2>&1 && cd $(git rev-parse --show-toplevel) || cd' # cd to root of git repo
 hash cmatrix       >/dev/null 2>&1 && alias cmatrix="tmux set status off; tmux resize-pane -Z; cmatrix; tmux resize-pane -Z; tmux set status on"
 hash rg            >/dev/null 2>&1 && alias grep='rg'
-hash khal          >/dev/null 2>&1 && alias kh='khal'
 hash exa           >/dev/null 2>&1 && alias ls='exa'
+hash eza           >/dev/null 2>&1 && alias ls='eza'
 hash ncdu          >/dev/null 2>&1 && alias ncdu='ncdu --color dark -rr -x --exclude .git --exclude node_modules'
 hash xdg-open      >/dev/null 2>&1 && alias open='xdg-open'
 hash prettyping    >/dev/null 2>&1 && alias ping='prettyping --nolegend'

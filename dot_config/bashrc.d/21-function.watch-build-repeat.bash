@@ -2,7 +2,7 @@
 
 if hash fd >/dev/null 2>&1 && hash entr >/dev/null 2>&1; then
   function watch-build-repeat() {
-    TIME_WRAPPER="$(which time) -f 'Rebuild complete (%e secs)'"
+    TIME_WRAPPER="$(type -P time) -f 'Rebuild complete (%e secs)'"
 
     while [ -z "$WBR_FINISHED" ]; do
       fd | entr -d bash -c "$TIME_WRAPPER $@; tput bel" && WBR_FINISHED=1

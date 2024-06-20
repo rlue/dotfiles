@@ -1,9 +1,11 @@
 # History ----------------------------------------------------------------------
 # don't put duplicate lines or lines starting with space in the history.
 setopt HIST_IGNORE_SPACE
+setopt HIST_SAVE_NO_DUPS
 
 export SAVEHIST=100000
 export HISTSIZE=10000
+export HISTFILE=~/.zsh_history
 
 # Force prompt to write history after every command.
 setopt INC_APPEND_HISTORY
