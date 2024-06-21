@@ -3,7 +3,7 @@
 
 require 'pathname'
 
-CJ_TABLE_PATH = Pathname.new(__dir__) + '../data/zh-tw/cangjie_table'
+CJ_TABLE_PATH = Pathname.new(__dir__) + '../share/cangjie/cj5.cin'
 
 raise(Errno::ENOENT, <<~ERR.chomp) unless File.exist?(CJ_TABLE_PATH)
   Input method table not found.

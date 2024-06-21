@@ -3,18 +3,18 @@
 
 require 'pathname'
 
-CJ_TABLE_PATH = Pathname.new(__dir__) + '../data/zh-tw/cangjie_table'
+CJ_TABLE_PATH = Pathname.new(__dir__) + '../share/cangjie/cj5.cin'
 
 module CangjieMap
   IM_TABLE_RAW = begin
-                   File.readlines(CJ_TABLE_PATH).freeze
-                 rescue Errno::ENOENT
-                   STDERR.puts(<<~ERR.chomp)
-                     Input method table not found.
-                     Download it from https://www.apt-browse.org/browse/debian/wheezy/main/all/openvanilla-imgeneric-data-zh-tw/0.9.0a1.3+dfsg1-2.1/file/usr/share/openvanilla/OVIMGeneric/cj5.cin
-                   ERR
-                   raise
-                 end
+    File.readlines(CJ_TABLE_PATH).freeze
+  rescue Errno::ENOENT
+    warn(<<~ERR.chomp)
+      Input method table not found.
+      Download it from https://www.apt-browse.org/browse/debian/wheezy/main/all/openvanilla-imgeneric-data-zh-tw/0.9.0a1.3+dfsg1-2.1/file/usr/share/openvanilla/OVIMGeneric/cj5.cin
+    ERR
+    raise
+  end
 
   module Radicals
     ROM_TO_CJ_MAP = IM_TABLE_RAW[12..37].map(&:split).to_h.freeze
