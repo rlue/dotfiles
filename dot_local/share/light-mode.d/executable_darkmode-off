@@ -1,15 +1,21 @@
 #!/bin/sh
 
-echo 0 > "${HOME}/.config/darkmode"
+export XDG_STATE_HOME=${XDG_STATE_HOME:-$HOME/.local/state}
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+
+mkdir -p ${XDG_STATE_HOME}/darkman
+echo 0 > "${XDG_STATE_HOME}/darkman/darkmode"
 
 # GTK
-sed --in-place --follow-symlinks 's/\(Net\/ThemeName ".*\)-Dark"/\1"/' "${HOME}/.config/xsettingsd"
-pkill -HUP -x xsettingsd
+if pgrep -x xsettingsd >/dev/null 2>&1; then
+  sed --in-place --follow-symlinks 's/\(Net\/\(Icon\)\?ThemeName "\(Papirus\|Arc\)\)-Dark"/\1"/' "${XDG_CONFIG_HOME}/xsettingsd"
+  systemctl --user restart xsettingsd
+fi
 
 # Alacritty
-# alacritty_conf="${HOME}/.config/alacritty/alacritty.yml"
-# light_theme="${HOME}/.config/alacritty/alacritty.seoul256-light.yml"
-# ln -f "$light_theme" "$alacritty_conf"
+sed --in-place --follow-symlinks 's/colors\/.*\.toml/colors\/seoul256-light.toml/' "${XDG_CONFIG_HOME}/alacritty/alacritty.toml"
+
+# nvim
 
 # tmux
-# tmux set-option -g status-bg darkgrey
+tmux set-option -g status-bg darkgrey
